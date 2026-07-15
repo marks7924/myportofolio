@@ -112,16 +112,17 @@ export async function duplicateProject(id: string) {
   try {
     const supabase = await createServerSideClient();
 
-    // Query original settings row
-    const { data: original, error: fetchErr } = await supabase
-      .from('projects')
-      .select('*, project_images(*)')
-      .eq('id', id)
-      .single();
+    // Query original settings row and images separately
+    const [projectResult, imagesResult] = await Promise.all([
+      supabase.from('projects').select('*').eq('id', id).single(),
+      supabase.from('project_images').select('*').eq('project_id', id),
+    ]);
 
-    if (fetchErr || !original) throw new Error('Original project record not found.');
+    if (projectResult.error || !projectResult.data) throw new Error('Original project record not found.');
+    const original = projectResult.data;
+    const project_images = imagesResult.data || [];
 
-    const { id: _, created_at: __, project_images, ...projectCopy } = original;
+    const { id: _, created_at: __, ...projectCopy } = original;
 
     projectCopy.title = {
       en: `${original.title.en} - Copy`,

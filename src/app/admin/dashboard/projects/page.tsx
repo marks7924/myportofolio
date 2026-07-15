@@ -4,18 +4,21 @@ import ProjectsManager from '@/components/admin/ProjectsManager';
 export default async function AdminProjectsPage() {
   const supabase = await createServerSideClient();
 
-  // Query all projects with their gallery images list
-  const { data: projects } = await supabase
-    .from('projects')
-    .select('*, project_images(*)')
-    .order('sort_order', { ascending: true });
+  // Query all projects and project images separately
+  const [projectsResult, imagesResult] = await Promise.all([
+    supabase.from('projects').select('*').order('sort_order', { ascending: true }),
+    supabase.from('project_images').select('*').order('sort_order', { ascending: true }),
+  ]);
 
-  // Make sure project images are sorted inside each project
-  const sortedProjects = (projects || []).map((project) => {
-    if (project.project_images) {
-      project.project_images.sort((a: any, b: any) => a.sort_order - b.sort_order);
-    }
-    return project;
+  const projects = projectsResult.data || [];
+  const images = imagesResult.data || [];
+
+  const sortedProjects = projects.map((project: any) => {
+    const projectImages = images.filter((img: any) => img.project_id === project.id);
+    return {
+      ...project,
+      project_images: projectImages,
+    };
   });
 
   return <ProjectsManager initialData={sortedProjects} />;

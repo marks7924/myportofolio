@@ -14,6 +14,7 @@ export async function getPublicData() {
     skillsResult,
     experienceResult,
     projectsResult,
+    projectImagesResult,
     servicesResult,
     testimonialsResult,
     certificationsResult,
@@ -27,7 +28,8 @@ export async function getPublicData() {
     supabase.from('skill_categories').select('*').order('sort_order', { ascending: true }),
     supabase.from('skills').select('*').order('sort_order', { ascending: true }),
     supabase.from('experience').select('*').order('sort_order', { ascending: true }),
-    supabase.from('projects').select('*, project_images(*)').eq('published', true).order('sort_order', { ascending: true }),
+    supabase.from('projects').select('*').eq('published', true).order('sort_order', { ascending: true }),
+    supabase.from('project_images').select('*').order('sort_order', { ascending: true }),
     supabase.from('services').select('*').order('sort_order', { ascending: true }),
     supabase.from('testimonials').select('*').eq('published', true).order('sort_order', { ascending: true }),
     supabase.from('certifications').select('*').order('sort_order', { ascending: true }),
@@ -42,6 +44,14 @@ export async function getPublicData() {
     });
   }
 
+  // Construct projects with images manually
+  const rawProjects = projectsResult.data || [];
+  const rawImages = projectImagesResult.data || [];
+  const projects = rawProjects.map((project: any) => ({
+    ...project,
+    project_images: rawImages.filter((img: any) => img.project_id === project.id),
+  }));
+
   return {
     settings: settingsResult.data || {},
     hero: heroResult.data || {},
@@ -51,7 +61,7 @@ export async function getPublicData() {
     skillCategories: skillCategoriesResult.data || [],
     skills: skillsResult.data || [],
     experience: experienceResult.data || [],
-    projects: projectsResult.data || [],
+    projects,
     services: servicesResult.data || [],
     testimonials: testimonialsResult.data || [],
     certifications: certificationsResult.data || [],
