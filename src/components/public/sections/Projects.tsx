@@ -27,6 +27,7 @@ interface ProjectsProps {
 export default function Projects({ data }: ProjectsProps) {
   const { t, tContent, locale } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [confirmUrl, setConfirmUrl] = useState<string | null>(null);
 
   const categories = ['all', ...Array.from(new Set(data.map((p) => p.category).filter(Boolean)))];
 
@@ -37,12 +38,7 @@ export default function Projects({ data }: ProjectsProps) {
 
   const handleImageClick = (liveDemo: string | null) => {
     if (!liveDemo) return;
-    const confirmMessage = locale === 'ar'
-      ? 'هل تريد الانتقال لمشاهدة المعاينة الحية للمشروع؟'
-      : 'Would you like to open the live preview of this project?';
-    if (window.confirm(confirmMessage)) {
-      window.open(liveDemo, '_blank', 'noopener,noreferrer');
-    }
+    setConfirmUrl(liveDemo);
   };
 
   return (
@@ -199,6 +195,43 @@ export default function Projects({ data }: ProjectsProps) {
           ))}
         </div>
       </div>
+
+      {/* Custom Confirmation Modal */}
+      {confirmUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+          <div className="glass-card max-w-sm w-full p-6 text-center space-y-6 shadow-xl border border-border/85 relative">
+            <div className="space-y-2">
+              <h4 className="font-display text-2xl text-foreground">
+                {locale === 'ar' ? 'معاينة مباشرة' : 'Live Preview'}
+              </h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {locale === 'ar'
+                  ? 'هل تريد الانتقال لمشاهدة المعاينة الحية للمشروع؟'
+                  : 'Would you like to open the live preview of this project?'}
+              </p>
+            </div>
+            <div className="flex gap-3 justify-center">
+              <button
+                type="button"
+                onClick={() => setConfirmUrl(null)}
+                className="px-5 py-2.5 rounded-full border border-border text-foreground hover:bg-secondary text-xs font-semibold tracking-wider uppercase transition-all duration-200 cursor-pointer"
+              >
+                {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  window.open(confirmUrl, '_blank', 'noopener,noreferrer');
+                  setConfirmUrl(null);
+                }}
+                className="px-5 py-2.5 rounded-full bg-foreground text-background font-semibold hover:opacity-85 text-xs font-semibold tracking-wider uppercase transition-all duration-200 cursor-pointer"
+              >
+                {locale === 'ar' ? 'مشاهدة' : 'View Demo'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
