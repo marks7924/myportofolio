@@ -45,12 +45,15 @@ export async function upsertProject(
     const supabase = await createServerSideClient();
     let projectId = projectData.id;
 
+    // Destructure to separate project_images and other relation metadata from database write payloads
+    const { id: _, created_at, project_images, ...dbData } = projectData as any;
+
     if (projectId) {
-      const { error } = await supabase.from('projects').update(projectData).eq('id', projectId);
+      const { error } = await supabase.from('projects').update(dbData).eq('id', projectId);
       if (error) throw error;
       await logAdminActivity('Updated Project', `Title: ${projectData.title.en}`);
     } else {
-      const { data, error } = await supabase.from('projects').insert(projectData).select('id').single();
+      const { data, error } = await supabase.from('projects').insert(dbData).select('id').single();
       if (error) throw error;
       projectId = data.id;
       await logAdminActivity('Created Project', `Title: ${projectData.title.en}`);
