@@ -40,6 +40,20 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+      {/* Inline script sets theme class before React hydrates — prevents #418 flash */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            try {
+              var t = localStorage.getItem('theme');
+              if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+              document.documentElement.classList.add(t);
+            } catch(e) {
+              document.documentElement.classList.add('light');
+            }
+          `,
+        }}
+      />
       <body className="min-h-full flex flex-col bg-background text-foreground transition-colors duration-300">
         <Providers initialDictionary={dictionary}>{children}</Providers>
       </body>
