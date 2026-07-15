@@ -309,6 +309,7 @@ create table public.social_links (
   url text not null,
   icon text, -- lucide icon
   sort_order integer default 0,
+  visible boolean default true,
   created_at timestamp with time zone default now()
 );
 

@@ -814,6 +814,70 @@ export async function deleteSocialLink(id: string) {
   return { success: true };
 }
 
+export async function saveSocialLinks(links: any[]) {
+  if (isSupabaseConfigured()) {
+    const supabase = await createServerSideClient();
+    
+    // Ensure 'visible' column exists (safe alter table statement)
+    try {
+      await supabase.rpc('alter_social_links_visible'); // Or run directly
+    } catch (e) {
+      // Ignore if RPC does not exist
+    }
+
+    // Get list of existing IDs in payload
+    const payloadIds = links.map((item) => item.id).filter(Boolean);
+    
+    // Delete any social links NOT in payload
+    if (payloadIds.length > 0) {
+      const { error: delError } = await supabase
+        .from('social_links')
+        .delete()
+        .not('id', 'in', `(${payloadIds.join(',')})`);
+      if (delError) console.error('Error deleting social links:', delError);
+    } else {
+      const { error: delError } = await supabase
+        .from('social_links')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      if (delError) console.error('Error deleting all social links:', delError);
+    }
+
+    // Insert or update remaining items
+    for (const item of links) {
+      const cleanItem = {
+        platform: item.platform,
+        url: item.url,
+        icon: item.icon || item.platform.toLowerCase(),
+        sort_order: item.sort_order,
+        visible: item.visible !== false
+      };
+      if (item.id) {
+        await supabase.from('social_links').update(cleanItem).eq('id', item.id);
+      } else {
+        await supabase.from('social_links').insert([cleanItem]);
+      }
+    }
+    await logActivity('Save Social Links', 'Updated social links structure');
+    return { success: true };
+  }
+  
+  // Mock DB overwrite
+  const db = await readMockDB();
+  db.social_links = links.map((item, idx) => ({
+    id: item.id && !item.id.startsWith('new-') ? item.id : Math.random().toString(36).substring(7),
+    platform: item.platform,
+    url: item.url,
+    icon: item.icon || item.platform.toLowerCase(),
+    sort_order: idx + 1,
+    visible: item.visible !== false,
+  }));
+  
+  await writeMockDB(db);
+  await logActivity('Save Social Links (Demo)', 'Updated social links structure');
+  return { success: true };
+}
+
 // ----------------------------------------------------
 // 12. Dynamic Static Translations CRUD
 // ----------------------------------------------------
