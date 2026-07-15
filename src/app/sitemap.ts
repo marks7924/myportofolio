@@ -1,12 +1,12 @@
 import { MetadataRoute } from 'next';
-import { createServerSideClient } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://antigrav-portfolio.vercel.app';
 
   let projectUrls: any[] = [];
   try {
-    const supabase = await createServerSideClient();
+    const supabase = createClient();
     const { data: projects } = await supabase
       .from('projects')
       .select('id, updated_at')

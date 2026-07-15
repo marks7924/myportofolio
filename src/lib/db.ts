@@ -826,15 +826,18 @@ export async function saveTranslation(translation: any) {
   }
   const db = await readMockDB();
   if (translation.id) {
-    const index = db.translations.findIndex(t => t.id === translation.id);
-    if (index !== -1) db.translations[index] = { ...db.translations[index], ...translation };
+    const index = db.translations.findIndex((t: any) => t.id === translation.id || t.key === translation.key);
+    if (index !== -1) db.translations[index] = { ...db.translations[index], ...translation } as any;
   } else {
     // Check if key already exists
-    const exists = db.translations.some(t => t.key === translation.key);
+    const exists = db.translations.some((t: any) => t.key === translation.key);
     if (exists) return { success: false, error: 'Key already exists' };
     
-    translation.id = Math.random().toString(36).substring(7);
-    db.translations.push(translation);
+    db.translations.push({
+      key: translation.key,
+      en: translation.en,
+      ar: translation.ar,
+    } as any);
   }
   await writeMockDB(db);
   await logActivity('Save Translation (Demo)', `Saved translation key: ${translation.key}`);
