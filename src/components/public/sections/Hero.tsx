@@ -3,7 +3,7 @@
 import React from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
-import { ArrowRight, MessageSquare } from 'lucide-react';
+import { ArrowRight, Mail } from 'lucide-react';
 
 interface HeroProps {
   data: {
@@ -21,93 +21,111 @@ interface HeroProps {
 export default function Hero({ data }: HeroProps) {
   const { tContent } = useLanguage();
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
+  const fadeUp = {
+    hidden: { opacity: 0, y: 24 },
+    visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { type: 'spring', stiffness: 100, damping: 15 },
-    },
+      transition: { duration: 0.55, delay: i * 0.12, ease: [0.25, 0.46, 0.45, 0.94] },
+    }),
   };
 
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden py-24 bg-background"
+      className="relative min-h-screen flex items-center justify-center bg-background py-32"
     >
-      {/* Handcrafted animated canvas backgrounds */}
-      {data.background_animation !== 'none' && (
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-35">
-          <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] lg:w-[500px] lg:h-[500px] rounded-full bg-primary/20 blur-[80px] lg:blur-[120px] animate-pulse-slow" />
-          <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] lg:w-[400px] lg:h-[400px] rounded-full bg-indigo-500/10 blur-[60px] lg:blur-[100px] animate-float" />
-          
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-        </div>
-      )}
+      {/* Clean diagonal stripe — subtle texture, no glow */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none opacity-[0.035] dark:opacity-[0.05]"
+        style={{
+          backgroundImage:
+            'repeating-linear-gradient(45deg, currentColor 0, currentColor 1px, transparent 0, transparent 50%)',
+          backgroundSize: '18px 18px',
+        }}
+      />
 
-      {/* Main Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      {/* Thin horizontal rule top */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-border" />
+
+      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+        {/* Eyebrow label */}
         <motion.div
-          variants={containerVariants}
+          custom={0}
+          variants={fadeUp}
           initial="hidden"
           animate="visible"
-          className="space-y-6"
+          className="mb-6"
         >
-          <motion.div
-            variants={itemVariants}
-            className="inline-flex items-center space-x-2 rtl:space-x-reverse px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-semibold uppercase tracking-wider"
-          >
-            <span>🚀 Ready for hire</span>
-          </motion.div>
+          <span className="tag">✦ Available for freelance</span>
+        </motion.div>
 
-          <motion.h1
-            variants={itemVariants}
-            className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight"
-          >
-            <span className="block text-foreground">{tContent(data.name)}</span>
-            <span className="block text-gradient mt-2 font-en">{tContent(data.title)}</span>
-          </motion.h1>
+        {/* Name — large serif display */}
+        <motion.h1
+          custom={1}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="font-display text-5xl sm:text-7xl md:text-8xl leading-[0.95] tracking-tight text-foreground mb-4"
+        >
+          {tContent(data.name)}
+        </motion.h1>
 
-          <motion.p
-            variants={itemVariants}
-            className="max-w-2xl mx-auto text-base sm:text-xl text-muted-foreground leading-relaxed"
-          >
-            {tContent(data.subtitle)}
-          </motion.p>
+        {/* Title — accent color, lighter weight */}
+        <motion.p
+          custom={2}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="text-xl sm:text-2xl font-medium text-primary mb-6 tracking-wide"
+        >
+          {tContent(data.title)}
+        </motion.p>
 
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
-          >
-            <a
-              href={data.cta_link || '#projects'}
-              className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-full shadow-lg hover:shadow-primary/25 flex items-center justify-center space-x-2 rtl:space-x-reverse transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-            >
-              <span>{tContent(data.cta_text) || 'Explore Work'}</span>
-              <ArrowRight size={18} className="rtl:rotate-180" />
-            </a>
+        {/* Thin separator */}
+        <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
+          <hr className="section-rule mb-8" />
+        </motion.div>
 
-            <a
-              href={data.cta_link_secondary || '#contact'}
-              className="w-full sm:w-auto px-8 py-4 bg-secondary hover:bg-secondary/80 text-foreground font-medium rounded-full border border-border flex items-center justify-center space-x-2 rtl:space-x-reverse transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-            >
-              <MessageSquare size={18} />
-              <span>{tContent(data.cta_text_secondary) || 'Contact Me'}</span>
-            </a>
-          </motion.div>
+        {/* Subtitle */}
+        <motion.p
+          custom={4}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="max-w-xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed mb-10"
+        >
+          {tContent(data.subtitle)}
+        </motion.p>
+
+        {/* CTA Buttons */}
+        <motion.div
+          custom={5}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3"
+        >
+          <a
+            href={data.cta_link || '#projects'}
+            className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-foreground text-background font-semibold rounded-full text-sm transition-all duration-200 hover:opacity-80"
+          >
+            {tContent(data.cta_text) || 'View Work'}
+            <ArrowRight size={15} className="rtl:rotate-180 group-hover:translate-x-0.5 transition-transform" />
+          </a>
+
+          <a
+            href={data.cta_link_secondary || '#contact'}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-transparent text-foreground font-semibold rounded-full text-sm border border-border transition-all duration-200 hover:border-foreground/40 hover:bg-secondary"
+          >
+            <Mail size={15} />
+            {tContent(data.cta_text_secondary) || 'Get in Touch'}
+          </a>
         </motion.div>
       </div>
+
+      {/* Bottom thin rule */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-border" />
     </section>
   );
 }
