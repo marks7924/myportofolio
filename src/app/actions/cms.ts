@@ -105,8 +105,7 @@ export async function updateNavigationItems(items: any[]) {
     const res = await saveNavigation(items);
     if (res.success) {
       await logAdminActivity('Updated Navigation Menu', `Item count: ${items.length}`);
-      revalidatePath('/');
-      revalidatePath('/admin/dashboard/navigation');
+      revalidatePath('/', 'layout');
       return { success: true };
     }
     return { success: false, error: (res as any).error || 'Failed to save navigation' };

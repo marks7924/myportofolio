@@ -371,3 +371,24 @@ create policy "Allow admin read logs" on public.activity_logs for select using (
 create policy "Allow admin insert logs" on public.activity_logs for insert with check (
   exists (select 1 from public.profiles where profiles.id = auth.uid() and profiles.role = 'admin')
 );
+
+
+-- Ensure storage bucket and policies exist
+insert into storage.buckets (id, name, public)
+values ('media', 'media', true)
+on conflict (id) do nothing;
+
+create policy "Allow public select media storage"
+on storage.objects for select using (bucket_id = 'media');
+
+create policy "Allow admin insert media storage"
+on storage.objects for insert with check (
+  bucket_id = 'media' and
+  exists (select 1 from public.profiles where profiles.id = auth.uid() and profiles.role = 'admin')
+);
+
+create policy "Allow admin delete media storage"
+on storage.objects for delete using (
+  bucket_id = 'media' and
+  exists (select 1 from public.profiles where profiles.id = auth.uid() and profiles.role = 'admin')
+);

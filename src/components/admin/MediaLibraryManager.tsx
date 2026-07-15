@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { createClient } from '@/lib/supabase';
-import { saveMediaMetadata, deleteMedia } from '@/app/actions/media';
+import { saveMediaMetadata, deleteMedia, ensureBucketExists } from '@/app/actions/media';
 import { Search, UploadCloud, Copy, Check, Trash2, HardDrive, Loader2, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 
@@ -53,6 +53,14 @@ export default function MediaLibraryManager({ initialMedia }: MediaLibraryManage
     setUploading(true);
     setUploadError(null);
     const supabase = createClient();
+
+    // Ensure storage bucket exists
+    const bucketRes = await ensureBucketExists();
+    if (!bucketRes.success) {
+      setUploadError(`Failed to prepare storage bucket: ${bucketRes.error}`);
+      setUploading(false);
+      return;
+    }
 
     for (const file of acceptedFiles) {
       // Validate size client-side

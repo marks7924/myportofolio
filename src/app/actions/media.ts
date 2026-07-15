@@ -1,7 +1,31 @@
 'use server';
 
-import { createServerSideClient } from '@/lib/supabase';
+import { createServerSideClient, createAdminClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+
+/**
+ * Ensures the public 'media' storage bucket exists in Supabase.
+ * Uses the Service Role Key for administrative bucket creation.
+ */
+export async function ensureBucketExists() {
+  try {
+    const adminSupabase = createAdminClient();
+    const { data: buckets, error: listError } = await adminSupabase.storage.listBuckets();
+    if (listError) throw listError;
+
+    const exists = buckets.some((b) => b.name === 'media');
+    if (!exists) {
+      const { error: createError } = await adminSupabase.storage.createBucket('media', {
+        public: true,
+      });
+      if (createError) throw createError;
+    }
+    return { success: true };
+  } catch (err: any) {
+    console.error('Failed to ensure media bucket exists:', err);
+    return { success: false, error: err.message };
+  }
+}
 
 /**
  * Saves media metadata AFTER the file has already been uploaded

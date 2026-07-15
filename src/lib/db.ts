@@ -713,7 +713,26 @@ export async function getNavigation() {
 export async function saveNavigation(navItems: any[]) {
   if (isSupabaseConfigured()) {
     const supabase = await createServerSideClient();
-    // Since it's a small list, we can write updates
+    
+    // Get list of existing IDs in payload
+    const payloadIds = navItems.map((item) => item.id).filter(Boolean);
+    
+    // Delete any navigation records NOT in payload
+    if (payloadIds.length > 0) {
+      const { error: delError } = await supabase
+        .from('navigation')
+        .delete()
+        .not('id', 'in', `(${payloadIds.join(',')})`);
+      if (delError) console.error('Error deleting navigation items:', delError);
+    } else {
+      const { error: delError } = await supabase
+        .from('navigation')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      if (delError) console.error('Error deleting all navigation items:', delError);
+    }
+
+    // Insert or update remaining items
     for (const item of navItems) {
       if (item.id) {
         await supabase.from('navigation').update(item).eq('id', item.id);
@@ -724,18 +743,17 @@ export async function saveNavigation(navItems: any[]) {
     await logActivity('Save Navigation', 'Updated navigation structure');
     return { success: true };
   }
+  
+  // Mock DB cleanup (overwrite array with new order and items)
   const db = await readMockDB();
-  navItems.forEach(item => {
-    if (item.id) {
-      const index = db.navigation.findIndex(n => n.id === item.id);
-      if (index !== -1) db.navigation[index] = { ...db.navigation[index], ...item };
-    } else {
-      item.id = Math.random().toString(36).substring(7);
-      db.navigation.push(item);
-    }
-  });
-  // Sort
-  db.navigation.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  db.navigation = navItems.map((item, idx) => ({
+    id: item.id && !item.id.startsWith('new-') ? item.id : Math.random().toString(36).substring(7),
+    label: item.label,
+    path: item.path,
+    sort_order: idx + 1,
+    visible: item.visible !== false,
+  }));
+  
   await writeMockDB(db);
   await logActivity('Save Navigation (Demo)', 'Updated navigation structure');
   return { success: true };
