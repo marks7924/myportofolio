@@ -59,11 +59,12 @@ export default function Skills({ categories, skills }: SkillsProps) {
     <section id="skills" className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6">
         {/* Title */}
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gradient">
+        <div className="text-center mb-16">
+          <span className="tag mb-4 inline-block">Expertise</span>
+          <h2 className="font-display text-4xl md:text-6xl text-foreground leading-tight mb-4">
             {t('skills_title', 'Skills & Expertise')}
           </h2>
-          <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
+          <p className="text-muted-foreground text-base max-w-xl mx-auto">
             {t('skills_subtitle', 'Categorized overview of my technical stack and proficiency levels')}
           </p>
         </div>
@@ -74,10 +75,10 @@ export default function Skills({ categories, skills }: SkillsProps) {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 cursor-pointer ${
+              className={`px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-200 cursor-pointer ${
                 activeCategory === cat.id
-                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-[1.02]'
-                  : 'bg-secondary hover:bg-secondary/80 text-foreground/80'
+                  ? 'bg-foreground text-background border-foreground'
+                  : 'bg-transparent text-muted-foreground border-border hover:border-foreground/40 hover:text-foreground'
               }`}
             >
               {tContent(cat.name)}

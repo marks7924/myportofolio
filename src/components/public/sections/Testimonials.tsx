@@ -26,7 +26,7 @@ export default function Testimonials({ data }: TestimonialsProps) {
       <div className="max-w-7xl mx-auto px-6">
         {/* Title */}
         <div className="text-center space-y-4 mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gradient">
+          <h2 className="font-display text-4xl md:text-6xl text-foreground leading-tight">
             {t('testimonials_title', 'Client Recommendations')}
           </h2>
           <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">

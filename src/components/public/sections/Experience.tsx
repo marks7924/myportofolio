@@ -35,7 +35,7 @@ export default function Experience({ data }: ExperienceProps) {
       <div className="max-w-6xl mx-auto px-6">
         {/* Title */}
         <div className="text-center space-y-4 mb-20">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gradient">
+          <h2 className="font-display text-4xl md:text-6xl text-foreground leading-tight">
             {t('experience_title', 'Work Experience')}
           </h2>
           <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
