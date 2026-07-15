@@ -2,6 +2,7 @@
 
 import { createServerSideClient } from '@/lib/supabase';
 import { revalidatePath } from 'next/cache';
+import { getNavigation, saveNavigation } from '@/lib/db';
 
 // Log admin action helper
 async function logAdminActivity(action: string, details: string) {
@@ -85,6 +86,30 @@ export async function updateSettings(data: {
     revalidatePath('/');
     revalidatePath('/admin/dashboard/settings');
     return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function getNavigationItems() {
+  try {
+    const items = await getNavigation();
+    return { success: true, data: items };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function updateNavigationItems(items: any[]) {
+  try {
+    const res = await saveNavigation(items);
+    if (res.success) {
+      await logAdminActivity('Updated Navigation Menu', `Item count: ${items.length}`);
+      revalidatePath('/');
+      revalidatePath('/admin/dashboard/navigation');
+      return { success: true };
+    }
+    return { success: false, error: res.error || 'Failed to save navigation' };
   } catch (err: any) {
     return { success: false, error: err.message };
   }

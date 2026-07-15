@@ -20,6 +20,7 @@ import {
   LogOut,
   Menu,
   X,
+  Compass,
 } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -39,6 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { label: 'Certifications', path: '/admin/dashboard/certifications', icon: <Award size={18} /> },
     { label: 'Messages Inbox', path: '/admin/dashboard/messages', icon: <Mail size={18} /> },
     { label: 'Media Library', path: '/admin/dashboard/media', icon: <ImageIcon size={18} /> },
+    { label: 'Navbar Items', path: '/admin/dashboard/navigation', icon: <Compass size={18} /> },
     { label: 'Settings', path: '/admin/dashboard/settings', icon: <Settings size={18} /> },
   ];
 
