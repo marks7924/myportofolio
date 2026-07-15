@@ -25,108 +25,102 @@ export default function Navbar({ navigation, siteName }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const activeLinks = navigation.filter((item) => item.visible);
 
-  const toggleLanguage = () => {
-    setLocale(locale === 'en' ? 'ar' : 'en');
-  };
-
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'glass py-4 shadow-lg border-b border-border'
-          : 'bg-transparent py-6'
+          ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-sm py-3'
+          : 'bg-transparent py-5'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        {/* Brand Logo */}
-        <a href="#hero" className="text-xl font-bold text-gradient tracking-wider font-en">
+      <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
+        {/* Brand */}
+        <a
+          href="#hero"
+          className="font-display text-lg font-normal tracking-tight text-foreground hover:text-primary transition-colors"
+        >
           {siteName || 'Portfolio'}
         </a>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 rtl:space-x-reverse">
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-1">
           {activeLinks.map((item) => (
             <a
               key={item.id}
               href={item.path}
-              className="px-4 py-2 rounded-full text-sm font-medium hover:text-primary transition-colors text-foreground/80"
+              className="px-3.5 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-secondary"
             >
               {tContent(item.label)}
             </a>
           ))}
 
-          {/* Theme & Language Switchers */}
-          <div className="flex items-center pl-4 border-l border-border rtl:border-l-0 rtl:border-r rtl:pr-4 rtl:pl-0 space-x-2 rtl:space-x-reverse">
+          {/* Controls */}
+          <div className="flex items-center gap-1 ml-3 pl-3 border-l border-border rtl:border-l-0 rtl:border-r rtl:pr-3 rtl:pl-0">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-secondary text-foreground/80 transition-colors cursor-pointer"
-              aria-label="Toggle Theme"
+              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors cursor-pointer"
+              aria-label="Toggle theme"
             >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
-
             <button
-              onClick={toggleLanguage}
-              className="p-2 rounded-full hover:bg-secondary text-foreground/80 flex items-center space-x-1 rtl:space-x-reverse transition-colors cursor-pointer"
-              aria-label="Switch Language"
+              onClick={() => setLocale(locale === 'en' ? 'ar' : 'en')}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary text-xs font-semibold uppercase transition-colors cursor-pointer"
+              aria-label="Switch language"
             >
-              <Globe size={18} />
-              <span className="text-xs font-bold uppercase">{locale === 'en' ? 'ar' : 'en'}</span>
+              <Globe size={14} />
+              {locale === 'en' ? 'AR' : 'EN'}
             </button>
           </div>
         </nav>
 
-        {/* Mobile menu trigger */}
-        <div className="md:hidden flex items-center space-x-3 rtl:space-x-reverse">
+        {/* Mobile controls */}
+        <div className="md:hidden flex items-center gap-1">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-secondary text-foreground/80 transition-colors"
+            className="p-2 rounded-md text-muted-foreground hover:bg-secondary transition-colors"
           >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-
           <button
-            onClick={toggleLanguage}
-            className="p-2 rounded-full hover:bg-secondary text-foreground/80 flex items-center space-x-1 rtl:space-x-reverse transition-colors"
+            onClick={() => setLocale(locale === 'en' ? 'ar' : 'en')}
+            className="flex items-center gap-1 px-2 py-1.5 rounded-md text-muted-foreground hover:bg-secondary text-xs font-semibold uppercase transition-colors"
           >
-            <Globe size={18} />
-            <span className="text-xs font-bold uppercase">{locale === 'en' ? 'ar' : 'en'}</span>
+            <Globe size={14} />
+            {locale === 'en' ? 'AR' : 'EN'}
           </button>
-
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 rounded-lg text-foreground hover:bg-secondary transition-colors"
+            className="p-2 rounded-md text-foreground hover:bg-secondary transition-colors"
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile drawer */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-b border-border overflow-hidden"
+            className="md:hidden bg-background border-b border-border overflow-hidden"
           >
-            <div className="px-6 py-4 flex flex-col space-y-3">
+            <div className="px-6 py-4 flex flex-col gap-1">
               {activeLinks.map((item) => (
                 <a
                   key={item.id}
                   href={item.path}
                   onClick={() => setIsOpen(false)}
-                  className="py-2 text-base font-medium text-foreground/90 hover:text-primary transition-colors border-b border-border/50 last:border-0"
+                  className="py-2.5 px-3 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-secondary rounded-md transition-colors"
                 >
                   {tContent(item.label)}
                 </a>

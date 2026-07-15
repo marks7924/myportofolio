@@ -18,14 +18,14 @@ export default function About({ data }: AboutProps) {
   const { t, tContent } = useLanguage();
 
   return (
-    <section id="about" className="py-24 bg-secondary/20 relative">
+    <section id="about" className="py-24 bg-secondary/30 border-t border-border">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Profile Image Container */}
           <div className="lg:col-span-5 flex justify-center">
             <div className="relative group w-[280px] h-[340px] md:w-[350px] md:h-[420px]">
               {/* Geometric borders */}
-              <div className="absolute inset-0 rounded-2xl border-2 border-primary/20 translate-x-4 translate-y-4 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-300" />
+              <div className="absolute inset-0 rounded-2xl border border-border translate-x-3 translate-y-3 group-hover:translate-x-1.5 group-hover:translate-y-1.5 transition-transform duration-300" />
 
               {/* Graphic wrapper */}
               <div className="absolute inset-0 rounded-2xl overflow-hidden glass-card">
@@ -49,7 +49,8 @@ export default function About({ data }: AboutProps) {
 
           {/* Text/Bio Description */}
           <div className="lg:col-span-7 space-y-6">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-gradient">
+            <span className="tag mb-3 inline-block">About</span>
+            <h2 className="font-display text-4xl md:text-5xl text-foreground leading-tight">
               {t('nav_about', 'About Me')}
             </h2>
 
@@ -67,7 +68,7 @@ export default function About({ data }: AboutProps) {
                   href={data.cv_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 rtl:space-x-reverse px-6 py-3.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-full transition-all duration-300 hover:scale-[1.02] shadow-md cursor-pointer"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-semibold text-sm rounded-full transition-opacity hover:opacity-75 cursor-pointer"
                 >
                   <FileText size={18} />
                   <span>{t('cv_download', 'Download Resume / CV')}</span>

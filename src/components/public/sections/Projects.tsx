@@ -39,11 +39,12 @@ export default function Projects({ data }: ProjectsProps) {
     <section id="projects" className="py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6">
         {/* Title */}
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-gradient">
+        <div className="text-center mb-16">
+          <span className="tag mb-4 inline-block">Work</span>
+          <h2 className="font-display text-4xl md:text-6xl text-foreground leading-tight mb-4">
             {t('projects_title', 'Featured Projects')}
           </h2>
-          <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto">
+          <p className="text-muted-foreground text-base max-w-xl mx-auto">
             {t('projects_subtitle', 'A selection of products I have architected and delivered recently')}
           </p>
         </div>
@@ -54,10 +55,10 @@ export default function Projects({ data }: ProjectsProps) {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider border transition-all duration-200 cursor-pointer ${
                 selectedCategory === cat
-                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/10'
-                  : 'bg-secondary hover:bg-secondary/80 text-foreground/75'
+                  ? 'bg-foreground text-background border-foreground'
+                  : 'bg-transparent text-muted-foreground border-border hover:border-foreground/40 hover:text-foreground'
               }`}
             >
               {cat === 'all' ? t('all_categories', 'All') : cat}
