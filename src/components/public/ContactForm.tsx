@@ -1,17 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { submitContactForm } from '@/app/actions/contact';
 import { useLanguage } from '@/context/LanguageContext';
 import { Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
-
-declare global {
-  interface Window {
-    grecaptcha: any;
-    onloadCallback: any;
-  }
-}
 
 export default function ContactForm() {
   const { t } = useLanguage();
@@ -19,38 +12,6 @@ export default function ContactForm() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
-  const recaptchaRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || 'placeholder-site-key';
-
-    window.onloadCallback = () => {
-      if (window.grecaptcha && document.getElementById('recaptcha-container')) {
-        window.grecaptcha.render('recaptcha-container', {
-          sitekey: siteKey === 'placeholder-site-key' ? '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI' : siteKey,
-          callback: (token: string) => {
-            recaptchaRef.current = token;
-          },
-          'expired-callback': () => {
-            recaptchaRef.current = null;
-          },
-        });
-      }
-    };
-
-    const script = document.createElement('script');
-    script.src = 'https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit';
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-      delete window.onloadCallback;
-    };
-  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,19 +20,6 @@ export default function ContactForm() {
     setFieldErrors({});
 
     const formData = new FormData(event.currentTarget);
-
-    if (!recaptchaRef.current) {
-      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || 'placeholder-site-key';
-      if (siteKey === 'placeholder-site-key') {
-        recaptchaRef.current = 'local-dev-bypass-token';
-      } else {
-        setError('Please complete the reCAPTCHA verification.');
-        setLoading(false);
-        return;
-      }
-    }
-
-    formData.append('recaptchaToken', recaptchaRef.current || '');
 
     try {
       const response = await submitContactForm(null, formData);
@@ -84,10 +32,6 @@ export default function ContactForm() {
           origin: { y: 0.6 },
         });
         event.currentTarget.reset();
-        if (window.grecaptcha) {
-          window.grecaptcha.reset();
-        }
-        recaptchaRef.current = null;
       } else {
         if (response.errors) {
           setFieldErrors(response.errors);
@@ -207,10 +151,6 @@ export default function ContactForm() {
             {fieldErrors.message && (
               <p className="text-xs text-destructive">{fieldErrors.message[0]}</p>
             )}
-          </div>
-
-          <div className="flex justify-center md:justify-start">
-            <div id="recaptcha-container" className="my-2" />
           </div>
 
           <button

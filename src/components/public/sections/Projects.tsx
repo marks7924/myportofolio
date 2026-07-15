@@ -25,7 +25,7 @@ interface ProjectsProps {
 }
 
 export default function Projects({ data }: ProjectsProps) {
-  const { t, tContent } = useLanguage();
+  const { t, tContent, locale } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   const categories = ['all', ...Array.from(new Set(data.map((p) => p.category).filter(Boolean)))];
@@ -34,6 +34,16 @@ export default function Projects({ data }: ProjectsProps) {
     selectedCategory === 'all'
       ? data
       : data.filter((p) => p.category === selectedCategory);
+
+  const handleImageClick = (liveDemo: string | null) => {
+    if (!liveDemo) return;
+    const confirmMessage = locale === 'ar'
+      ? 'هل تريد الانتقال لمشاهدة المعاينة الحية للمشروع؟'
+      : 'Would you like to open the live preview of this project?';
+    if (window.confirm(confirmMessage)) {
+      window.open(liveDemo, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   return (
     <section id="projects" className="py-24 bg-background">
@@ -74,7 +84,13 @@ export default function Projects({ data }: ProjectsProps) {
               className="glass-card group flex flex-col overflow-hidden hover:scale-[1.01] transition-transform duration-500"
             >
               {/* Cover preview */}
-              <div className="relative aspect-video w-full overflow-hidden bg-muted/30 border-b border-border/55">
+              <div
+                onClick={() => handleImageClick(project.live_demo)}
+                className={`relative aspect-video w-full overflow-hidden bg-muted/30 border-b border-border/55 ${
+                  project.live_demo ? 'cursor-pointer' : ''
+                }`}
+                title={project.live_demo ? (locale === 'ar' ? 'انقر لفتح معاينة مباشرة للموقع' : 'Click to open live website demo') : undefined}
+              >
                 {project.cover_image ? (
                   <Image
                     src={project.cover_image}

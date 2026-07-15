@@ -10,7 +10,6 @@ const contactSchema = z.object({
   phone: z.string().optional().nullable(),
   subject: z.string().min(3, { message: 'Subject must be at least 3 characters.' }),
   message: z.string().min(10, { message: 'Message must be at least 10 characters.' }),
-  recaptchaToken: z.string().min(1, { message: 'reCAPTCHA token is missing.' }),
 });
 
 export async function submitContactForm(prevState: any, formData: FormData) {
@@ -20,7 +19,6 @@ export async function submitContactForm(prevState: any, formData: FormData) {
     phone: formData.get('phone') as string || null,
     subject: formData.get('subject') as string,
     message: formData.get('message') as string,
-    recaptchaToken: formData.get('recaptchaToken') as string,
   };
 
   // 1. Zod Validation
@@ -30,27 +28,6 @@ export async function submitContactForm(prevState: any, formData: FormData) {
   }
 
   const validated = result.data;
-
-  // 2. Google reCAPTCHA verification
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-  if (secretKey && secretKey !== 'placeholder-secret-key') {
-    try {
-      const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `secret=${secretKey}&response=${validated.recaptchaToken}`,
-      });
-      const verification = await response.json();
-      if (!verification.success) {
-        return { success: false, error: 'reCAPTCHA verification failed. Please try again.' };
-      }
-    } catch (err) {
-      console.error('reCAPTCHA validation error:', err);
-      return { success: false, error: 'Network error verifying reCAPTCHA.' };
-    }
-  } else {
-    console.warn('Skipping reCAPTCHA verification: RECAPTCHA_SECRET_KEY is missing or placeholder.');
-  }
 
   // 3. PostgreSQL Database write
   try {
