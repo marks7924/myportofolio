@@ -109,7 +109,7 @@ export async function updateNavigationItems(items: any[]) {
       revalidatePath('/admin/dashboard/navigation');
       return { success: true };
     }
-    return { success: false, error: res.error || 'Failed to save navigation' };
+    return { success: false, error: (res as any).error || 'Failed to save navigation' };
   } catch (err: any) {
     return { success: false, error: err.message };
   }
